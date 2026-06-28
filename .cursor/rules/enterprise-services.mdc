@@ -1,0 +1,46 @@
+---
+description: Conventions for enterprise services, DI token usage, and the enterprise layer architecture.
+globs: src/enterprise/**/*.ts
+alwaysApply: false
+---
+
+# Enterprise Service Conventions
+
+All enterprise code lives in `src/enterprise/`. Follow these patterns for consistency.
+
+## Service structure
+
+```typescript
+// 1. Injectable with providedIn: 'root' or provided in enterprise-main.ts
+@Injectable()
+export class EnterpriseSessionService extends SessionService {
+  // Extend the upstream abstract class
+  // Add auth headers, tenant scoping, etc.
+}
+```
+
+## Overriding upstream services
+
+When replacing an upstream service, use the same injection token:
+
+```typescript
+// enterprise-main.ts
+import { SESSION_SERVICE } from '../app/core/services/interfaces/session';
+import { EnterpriseSessionService } from './auth/enterprise-session.service';
+
+{ provide: SESSION_SERVICE, useClass: EnterpriseSessionService }
+```
+
+## Adding new enterprise-only services
+
+For services that don't replace upstream functionality:
+
+1. Create an interface and injection token in the same file
+2. Provide a mock for testing
+3. Wire in `enterprise-main.ts`
+
+## State management
+
+- Use Angular signals for synchronous reactive state
+- Use RxJS observables for async data flows
+- No NgRx — keep it simple, consistent with upstream patterns

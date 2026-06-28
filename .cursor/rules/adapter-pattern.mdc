@@ -1,0 +1,44 @@
+---
+description: How to implement a new agent framework adapter in the multi-framework adapter layer.
+globs: src/enterprise/adapters/**
+alwaysApply: false
+---
+
+# Framework Adapter Pattern
+
+Every agent framework adapter must implement the `AgentAdapter` interface and be registered in the `AdapterRegistry`.
+
+## File structure for a new adapter
+
+```
+src/enterprise/adapters/<framework>/
+├── <framework>.adapter.ts        # AgentAdapter implementation
+├── <framework>.adapter.spec.ts   # Tests
+├── <framework>.models.ts         # Framework-specific types (optional)
+└── index.ts                      # Public exports
+```
+
+## Implementation checklist
+
+1. Implement `AgentAdapter` from `adapter.interface.ts`
+2. Translate framework events to/from ADK `Event` model (from `src/app/core/models/types.ts`)
+3. Declare capability support honestly (`supportsStreaming()`, `supportsTracing()`, etc.)
+4. Register in `src/enterprise/adapters/registry.ts`
+5. Add unit tests with mock HTTP responses
+6. Handle errors gracefully — adapt framework-specific errors to a unified error format
+
+## Event model translation
+
+The upstream UI expects ADK `Event` objects. Your adapter must translate:
+
+```typescript
+// Framework response → ADK Event
+function toAdkEvent(frameworkResponse: FrameworkResponse): Event {
+  return {
+    id: frameworkResponse.id,
+    author: frameworkResponse.agent_name,
+    content: { role: 'model', parts: [{ text: frameworkResponse.output }] },
+    timestamp: frameworkResponse.created_at,
+  };
+}
+```

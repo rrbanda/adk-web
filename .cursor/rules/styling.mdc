@@ -1,0 +1,33 @@
+---
+description: Theming and styling conventions — CSS variables, Material 21, light/dark support.
+globs: "**/*.scss"
+alwaysApply: false
+---
+
+# Styling Conventions
+
+## CSS custom properties only
+
+Never hardcode color values. Use Material 21 CSS variables:
+
+```scss
+// BAD
+color: #1a73e8;
+background: rgb(255, 255, 255);
+
+// GOOD
+color: var(--mat-sys-primary);
+background: var(--mat-sys-surface);
+```
+
+## Enterprise theme overrides
+
+Place enterprise styling in `src/enterprise/styles/`. Override upstream variables, never upstream stylesheets.
+
+## Light and dark theme
+
+Both themes must be supported. Use `--mat-sys-*` variables that automatically adapt. Test both themes visually when adding UI.
+
+## Angular Material 21
+
+Use Material components and their theming APIs. Avoid custom implementations of standard UI patterns (buttons, dialogs, menus, tabs).

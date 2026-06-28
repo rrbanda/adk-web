@@ -1,0 +1,31 @@
+---
+description: Prevents modification of upstream google/adk-web code. All enterprise code must go in src/enterprise/.
+globs: src/app/**,src/main.ts
+alwaysApply: false
+---
+
+# Upstream Boundary — Do Not Modify
+
+These files belong to the upstream google/adk-web project and are periodically rebased. **Never edit them directly.**
+
+## What to do instead
+
+- Create enterprise overrides in `src/enterprise/`
+- Use injection tokens to swap upstream services (see `docs/upstream-audit.md` for the full list)
+- If the upstream lacks an extension point you need, document it in `docs/upstream-audit.md` and consider contributing the extension point upstream
+
+## Key injection tokens for overrides
+
+```typescript
+// In enterprise-main.ts, provide your own implementations:
+{ provide: AGENT_SERVICE, useClass: EnterpriseAgentService }
+{ provide: SESSION_SERVICE, useClass: EnterpriseSessionService }
+{ provide: FEATURE_FLAG_SERVICE, useClass: EnterpriseFeatureFlagService }
+{ provide: THEME_SERVICE, useClass: EnterpriseBrandingService }
+```
+
+## If you think you need to edit upstream
+
+1. Check if an injection token already covers your need
+2. If not, add the extension point upstream via a PR to google/adk-web
+3. Never work around a missing extension point by editing upstream files in this repo

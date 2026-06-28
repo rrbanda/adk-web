@@ -1,0 +1,36 @@
+---
+description: Testing conventions including the required initTestBed() call and mock service patterns.
+globs: "**/*.spec.ts"
+alwaysApply: false
+---
+
+# Testing Conventions
+
+## Required: initTestBed() before TestBed
+
+Every spec file must call `initTestBed()` before `TestBed.configureTestingModule()`. This is a compatibility requirement from upstream.
+
+```typescript
+import { initTestBed } from '../../testing/utils';
+
+describe('MyComponent', () => {
+  beforeEach(async () => {
+    initTestBed();  // MUST be called first
+    await TestBed.configureTestingModule({
+      imports: [MyComponent],
+      providers: [
+        { provide: AGENT_SERVICE, useClass: MockAgentService },
+      ],
+    }).compileComponents();
+  });
+});
+```
+
+## Mock services
+
+Use upstream mocks from `src/app/core/services/testing/` for upstream service dependencies. Create enterprise mocks alongside their services.
+
+## Test file placement
+
+- Place `*.spec.ts` next to the file being tested
+- Follow the same naming: `my-service.ts` → `my-service.spec.ts`
